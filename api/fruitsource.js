@@ -1,4 +1,18 @@
 async function patchCode(code) {
+  // ── Símbolos quebrados do Separador ─────────────────────────────────
+  // Sep1 (esquerda)
+  code = code.replace(
+    /Sep1\.Text = "âŒ©<font color=\\"rgb\(255, 0, 0\)\\">âŒ©<\/font>"/g,
+    'Sep1.Text = "<font color=\\"rgb(0, 255, 100)\\">◈</font>"'
+  );
+  // Sep3 (direita)
+  code = code.replace(
+    /Sep3\.Text = "<font color=\\"rgb\(255, 0, 0\)\\">âŒª<\/font>âŒª"/g,
+    'Sep3.Text = "<font color=\\"rgb(0, 255, 100)\\">◈</font>"'
+  );
+  // Cor vermelha dentro dos separadores → verde neon
+  code = code.replace(/rgb\(255, 0, 0\)/g, "rgb(0, 255, 100)");
+
   // ── Nome ────────────────────────────────────────────────────────────
   code = code.replace(/"NoxHub"/g, '"CEBOLINHA HUB"');
   code = code.replace(/'NoxHub'/g, "'CEBOLINHA HUB'");

@@ -1,4 +1,4 @@
-    const SECRET_KEY = "8186a7a7fc38c24d9a43c93637f6c0933fbdae0394b9c6ac";
+const SECRET_KEY = "8186a7a7fc38c24d9a43c93637f6c0933fbdae0394b9c6ac";
 
 async function patchCode(code) {
   code = code.replace(/"NoxHub"/g, '"CEBOLINHA HUB"');
@@ -23,6 +23,9 @@ async function patchCode(code) {
   code = code.replace(/_G\.Primary = Color3\.fromRGB\(100,\s*100,\s*100\)/g, "_G.Primary = Color3.fromRGB(15, 45, 20)");
   code = code.replace(/_G\.Dark = Color3\.fromRGB\(22,\s*22,\s*26\)/g, "_G.Dark = Color3.fromRGB(10, 30, 15)");
   code = code.replace(/_G\.Third = Color3\.fromRGB\(255,\s*0,\s*0\)/g, "_G.Third = Color3.fromRGB(0, 255, 100)");
+
+  // ── SubTitle ─────────────────────────────────────────────────────────
+  code = code.replace(/SubTitle = "Blox Fruits"/g, 'SubTitle = "DEV: POCOYO.JS"');
 
   code = code.replace(/Color3\.fromRGB\(24,\s*24,\s*26\)/g,    "Color3.fromRGB(10, 30, 15)");
   code = code.replace(/Color3\.fromRGB\(10,\s*10,\s*10\)/g,    "Color3.fromRGB(8, 22, 12)");

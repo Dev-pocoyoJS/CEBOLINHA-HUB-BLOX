@@ -1,18 +1,15 @@
-const SECRET_KEY = "8186a7a7fc38c24d9a43c93637f6c0933fbdae0394b9c6ac";
+    const SECRET_KEY = "8186a7a7fc38c24d9a43c93637f6c0933fbdae0394b9c6ac";
 
 async function patchCode(code) {
-  // ── Nome ────────────────────────────────────────────────────────────
   code = code.replace(/"NoxHub"/g, '"CEBOLINHA HUB"');
   code = code.replace(/'NoxHub'/g, "'CEBOLINHA HUB'");
   code = code.replace(/\.Text\s*=\s*"NoxHub"/g, '.Text = "CEBOLINHA HUB"');
 
-  // ── Logo ────────────────────────────────────────────────────────────
   code = code.replace(/rbxassetid:\/\/13940080072/g, "rbxassetid://130502669139756");
   code = code.replace(/rbxassetid:\/\/17428732487/g, "rbxassetid://130502669139756");
   code = code.replace(/rbxassetid:\/\/17428732488/g, "rbxassetid://130502669139756");
   code = code.replace(/rbxassetid:\/\/14759368201/g, "rbxassetid://130502669139756");
 
-  // ── Símbolos quebrados do Separador ─────────────────────────────────
   code = code.replace(
     /Sep1\.Text = "âŒ©<font color=\\"rgb\(255, 0, 0\)\\">âŒ©<\/font>"/g,
     'Sep1.Text = "<font color=\\"rgb(0, 255, 100)\\">◈</font>"'
@@ -23,25 +20,19 @@ async function patchCode(code) {
   );
   code = code.replace(/rgb\(255, 0, 0\)/g, "rgb(0, 255, 100)");
 
-  // ── Cores globais ────────────────────────────────────────────────────
-  code = code.replace(/_G\.Primary = Color3\.fromRGB\(100,\s*100,\s*100\)/g,
-    "_G.Primary = Color3.fromRGB(15, 45, 20)");
-  code = code.replace(/_G\.Dark = Color3\.fromRGB\(22,\s*22,\s*26\)/g,
-    "_G.Dark = Color3.fromRGB(10, 30, 15)");
-  code = code.replace(/_G\.Third = Color3\.fromRGB\(255,\s*0,\s*0\)/g,
-    "_G.Third = Color3.fromRGB(0, 255, 100)");
+  code = code.replace(/_G\.Primary = Color3\.fromRGB\(100,\s*100,\s*100\)/g, "_G.Primary = Color3.fromRGB(15, 45, 20)");
+  code = code.replace(/_G\.Dark = Color3\.fromRGB\(22,\s*22,\s*26\)/g, "_G.Dark = Color3.fromRGB(10, 30, 15)");
+  code = code.replace(/_G\.Third = Color3\.fromRGB\(255,\s*0,\s*0\)/g, "_G.Third = Color3.fromRGB(0, 255, 100)");
 
-  // ── Cores hardcoded ──────────────────────────────────────────────────
-  code = code.replace(/Color3\.fromRGB\(24,\s*24,\s*26\)/g,  "Color3.fromRGB(10, 30, 15)");
-  code = code.replace(/Color3\.fromRGB\(10,\s*10,\s*10\)/g,  "Color3.fromRGB(8, 22, 12)");
-  code = code.replace(/Color3\.fromRGB\(30,\s*30,\s*30\)/g,  "Color3.fromRGB(12, 35, 18)");
-  code = code.replace(/Color3\.fromRGB\(45,\s*45,\s*45\)/g,  "Color3.fromRGB(15, 45, 20)");
-  code = code.replace(/Color3\.fromRGB\(5,\s*5,\s*5\)/g,     "Color3.fromRGB(5, 18, 8)");
-  code = code.replace(/Color3\.fromRGB\(50,\s*50,\s*50\)/g,  "Color3.fromRGB(15, 45, 20)");
-  code = code.replace(/Color3\.fromRGB\(255,\s*0,\s*0\)/g,   "Color3.fromRGB(0, 255, 100)");
+  code = code.replace(/Color3\.fromRGB\(24,\s*24,\s*26\)/g,    "Color3.fromRGB(10, 30, 15)");
+  code = code.replace(/Color3\.fromRGB\(10,\s*10,\s*10\)/g,    "Color3.fromRGB(8, 22, 12)");
+  code = code.replace(/Color3\.fromRGB\(30,\s*30,\s*30\)/g,    "Color3.fromRGB(12, 35, 18)");
+  code = code.replace(/Color3\.fromRGB\(45,\s*45,\s*45\)/g,    "Color3.fromRGB(15, 45, 20)");
+  code = code.replace(/Color3\.fromRGB\(5,\s*5,\s*5\)/g,       "Color3.fromRGB(5, 18, 8)");
+  code = code.replace(/Color3\.fromRGB\(50,\s*50,\s*50\)/g,    "Color3.fromRGB(15, 45, 20)");
+  code = code.replace(/Color3\.fromRGB\(255,\s*0,\s*0\)/g,     "Color3.fromRGB(0, 255, 100)");
   code = code.replace(/Color3\.fromRGB\(100,\s*100,\s*100\)/g, "Color3.fromRGB(15, 45, 20)");
 
-  // ── Redireciona sub-arquivos para o proxy ───────────────────────────
   code = code.replace(
     /https:\/\/you\.whimper\.xyz\/sources\/nox\/BloxFruits\.lua/g,
     "https://cebolinha-hub-blox.vercel.app/bloxfruits.lua"
@@ -55,10 +46,12 @@ async function patchCode(code) {
 }
 
 export default async function handler(req, res) {
-  // ── Verificação da chave secreta ─────────────────────────────────────
-  const clientKey = req.headers["x-cebolinha-key"];
-  if (clientKey !== SECRET_KEY) {
-    return res.status(403).send("-- ❌ Acesso negado. Use o loader oficial do CEBOLINHA HUB.");
+  // Verifica chave na URL (?key=...) ou no header
+  const urlKey = new URL(req.url, "https://cebolinha-hub-blox.vercel.app").searchParams.get("key");
+  const headerKey = req.headers["x-cebolinha-key"];
+
+  if (urlKey !== SECRET_KEY && headerKey !== SECRET_KEY) {
+    return res.status(403).send('-- ❌ Acesso negado. Use o loader oficial do CEBOLINHA HUB.');
   }
 
   try {
@@ -81,6 +74,16 @@ export default async function handler(req, res) {
 
     let code = await response.text();
     code = await patchCode(code);
+
+    // Redireciona sub-chamadas para incluir a chave
+    code = code.replace(
+      /https:\/\/cebolinha-hub-blox\.vercel\.app\/bloxfruits\.lua/g,
+      `https://cebolinha-hub-blox.vercel.app/bloxfruits.lua?key=${SECRET_KEY}`
+    );
+    code = code.replace(
+      /https:\/\/cebolinha-hub-blox\.vercel\.app\/fruitsource\.lua/g,
+      `https://cebolinha-hub-blox.vercel.app/fruitsource.lua?key=${SECRET_KEY}`
+    );
 
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
     res.setHeader("Access-Control-Allow-Origin", "*");

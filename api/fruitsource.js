@@ -5,6 +5,7 @@ async function patchCode(code) {
   code = code.replace(/'NoxHub'/g, "'CEBOLINHA HUB'");
   code = code.replace(/\.Text\s*=\s*"NoxHub"/g, '.Text = "CEBOLINHA HUB"');
   code = code.replace(/Loading NoxHub/g, "Loading CEBOLINHA HUB");
+  code = code.replace(/https:\/\/discord\.com\/invite\/25ms/g, "https://discord.gg/z5DhUvEx6Z");
   code = code.replace(/Security verification passed\. Loading NoxHub\.\.\./g, "CEBOLINHA HUB carregado com sucesso!");
 
   code = code.replace(/rbxassetid:\/\/13940080072/g, "rbxassetid://130502669139756");

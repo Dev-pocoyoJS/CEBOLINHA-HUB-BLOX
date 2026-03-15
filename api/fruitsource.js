@@ -27,7 +27,8 @@ async function patchCode(code) {
   code = code.replace(/Color3\.fromRGB\(120,\s*0,\s*0\)/g,    "Color3.fromRGB(0, 200, 80)");
   code = code.replace(/Color3\.fromRGB\(100,\s*0,\s*0\)/g,    "Color3.fromRGB(0, 200, 80)");
 
-  // ── Fundo principal: preto → verde neon escuro ──────────────────────
+  // ── Fundo principal (_G.Dark): preto → verde neon escuro ────────────
+  code = code.replace(/Color3\.fromRGB\(22,\s*22,\s*26\)/g,   "Color3.fromRGB(10, 30, 15)"); // _G.Dark exato
   code = code.replace(/Color3\.fromRGB\(30,\s*30,\s*30\)/g,   "Color3.fromRGB(10, 30, 15)");
   code = code.replace(/Color3\.fromRGB\(25,\s*25,\s*25\)/g,   "Color3.fromRGB(10, 30, 15)");
   code = code.replace(/Color3\.fromRGB\(20,\s*20,\s*20\)/g,   "Color3.fromRGB(10, 30, 15)");
@@ -35,6 +36,9 @@ async function patchCode(code) {
   code = code.replace(/Color3\.fromRGB\(15,\s*15,\s*15\)/g,   "Color3.fromRGB(10, 30, 15)");
   code = code.replace(/Color3\.fromRGB\(10,\s*10,\s*10\)/g,   "Color3.fromRGB(10, 30, 15)");
   code = code.replace(/Color3\.fromRGB\(0,\s*0,\s*0\)/g,      "Color3.fromRGB(10, 30, 15)");
+
+  // ── Painéis (_G.Primary): cinza → verde escuro ──────────────────────
+  code = code.replace(/Color3\.fromRGB\(100,\s*100,\s*100\)/g, "Color3.fromRGB(15, 45, 20)"); // _G.Primary exato
 
   // ── Painéis/sidebar: cinza escuro → verde escuro ────────────────────
   code = code.replace(/Color3\.fromRGB\(40,\s*40,\s*40\)/g,   "Color3.fromRGB(15, 45, 20)");

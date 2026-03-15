@@ -10,43 +10,36 @@ async function patchCode(code) {
   code = code.replace(/rbxassetid:\/\/17428732488/g, "rbxassetid://130502669139756");
   code = code.replace(/rbxassetid:\/\/14759368201/g, "rbxassetid://130502669139756");
 
-  // ── Cor primária: vermelho → verde neon ─────────────────────────────
-  code = code.replace(/Color3\.fromRGB\(255,\s*50,\s*50\)/g,  "Color3.fromRGB(0, 255, 100)");
-  code = code.replace(/Color3\.fromRGB\(255,\s*0,\s*0\)/g,    "Color3.fromRGB(0, 255, 100)");
-  code = code.replace(/Color3\.fromRGB\(220,\s*50,\s*50\)/g,  "Color3.fromRGB(0, 255, 100)");
-  code = code.replace(/Color3\.fromRGB\(200,\s*0,\s*0\)/g,    "Color3.fromRGB(0, 255, 100)");
-  code = code.replace(/Color3\.fromRGB\(180,\s*0,\s*0\)/g,    "Color3.fromRGB(0, 255, 100)");
-  code = code.replace(/Color3\.fromRGB\(239,\s*68,\s*68\)/g,  "Color3.fromRGB(0, 255, 100)");
-  code = code.replace(/Color3\.fromRGB\(255,\s*68,\s*68\)/g,  "Color3.fromRGB(0, 255, 100)");
-  code = code.replace(/Color3\.fromRGB\(231,\s*76,\s*60\)/g,  "Color3.fromRGB(0, 255, 100)");
-  code = code.replace(/Color3\.fromRGB\(255,\s*59,\s*48\)/g,  "Color3.fromRGB(0, 255, 100)");
-  code = code.replace(/Color3\.fromRGB\(255,\s*45,\s*45\)/g,  "Color3.fromRGB(0, 255, 100)");
+  // ── Cores globais ────────────────────────────────────────────────────
+  // _G.Primary (cinza dos painéis) → verde escuro
+  code = code.replace(/_G\.Primary = Color3\.fromRGB\(100,\s*100,\s*100\)/g,
+    "_G.Primary = Color3.fromRGB(15, 45, 20)");
 
-  // ── Hover/destaque: vermelho escuro → verde médio ───────────────────
-  code = code.replace(/Color3\.fromRGB\(150,\s*0,\s*0\)/g,    "Color3.fromRGB(0, 200, 80)");
-  code = code.replace(/Color3\.fromRGB\(120,\s*0,\s*0\)/g,    "Color3.fromRGB(0, 200, 80)");
-  code = code.replace(/Color3\.fromRGB\(100,\s*0,\s*0\)/g,    "Color3.fromRGB(0, 200, 80)");
+  // _G.Dark (fundo principal) → verde neon escuro
+  code = code.replace(/_G\.Dark = Color3\.fromRGB\(22,\s*22,\s*26\)/g,
+    "_G.Dark = Color3.fromRGB(10, 30, 15)");
 
-  // ── Fundo principal (_G.Dark): preto → verde neon escuro ────────────
-  code = code.replace(/Color3\.fromRGB\(22,\s*22,\s*26\)/g,   "Color3.fromRGB(10, 30, 15)"); // _G.Dark exato
-  code = code.replace(/Color3\.fromRGB\(30,\s*30,\s*30\)/g,   "Color3.fromRGB(10, 30, 15)");
-  code = code.replace(/Color3\.fromRGB\(25,\s*25,\s*25\)/g,   "Color3.fromRGB(10, 30, 15)");
-  code = code.replace(/Color3\.fromRGB\(20,\s*20,\s*20\)/g,   "Color3.fromRGB(10, 30, 15)");
-  code = code.replace(/Color3\.fromRGB\(18,\s*18,\s*18\)/g,   "Color3.fromRGB(10, 30, 15)");
-  code = code.replace(/Color3\.fromRGB\(15,\s*15,\s*15\)/g,   "Color3.fromRGB(10, 30, 15)");
-  code = code.replace(/Color3\.fromRGB\(10,\s*10,\s*10\)/g,   "Color3.fromRGB(10, 30, 15)");
-  code = code.replace(/Color3\.fromRGB\(0,\s*0,\s*0\)/g,      "Color3.fromRGB(10, 30, 15)");
+  // _G.Third (vermelho dos botões/tab selecionada) → verde neon
+  code = code.replace(/_G\.Third = Color3\.fromRGB\(255,\s*0,\s*0\)/g,
+    "_G.Third = Color3.fromRGB(0, 255, 100)");
 
-  // ── Painéis (_G.Primary): cinza → verde escuro ──────────────────────
-  code = code.replace(/Color3\.fromRGB\(100,\s*100,\s*100\)/g, "Color3.fromRGB(15, 45, 20)"); // _G.Primary exato
-
-  // ── Painéis/sidebar: cinza escuro → verde escuro ────────────────────
-  code = code.replace(/Color3\.fromRGB\(40,\s*40,\s*40\)/g,   "Color3.fromRGB(15, 45, 20)");
-  code = code.replace(/Color3\.fromRGB\(35,\s*35,\s*35\)/g,   "Color3.fromRGB(15, 45, 20)");
-  code = code.replace(/Color3\.fromRGB\(45,\s*45,\s*45\)/g,   "Color3.fromRGB(15, 45, 20)");
-  code = code.replace(/Color3\.fromRGB\(50,\s*50,\s*50\)/g,   "Color3.fromRGB(20, 55, 25)");
-  code = code.replace(/Color3\.fromRGB\(55,\s*55,\s*55\)/g,   "Color3.fromRGB(20, 55, 25)");
-  code = code.replace(/Color3\.fromRGB\(60,\s*60,\s*60\)/g,   "Color3.fromRGB(25, 60, 30)");
+  // ── Cores hardcoded da janela principal ──────────────────────────────
+  // Fundo janela
+  code = code.replace(/Color3\.fromRGB\(24,\s*24,\s*26\)/g,  "Color3.fromRGB(10, 30, 15)");
+  // Barras laterais / scroll
+  code = code.replace(/Color3\.fromRGB\(10,\s*10,\s*10\)/g,  "Color3.fromRGB(8, 22, 12)");
+  // OutlineMain
+  code = code.replace(/Color3\.fromRGB\(30,\s*30,\s*30\)/g,  "Color3.fromRGB(12, 35, 18)");
+  // Tab background
+  code = code.replace(/Color3\.fromRGB\(45,\s*45,\s*45\)/g,  "Color3.fromRGB(15, 45, 20)");
+  // Loading screen fundo
+  code = code.replace(/Color3\.fromRGB\(5,\s*5,\s*5\)/g,     "Color3.fromRGB(5, 18, 8)");
+  // Loading bar background
+  code = code.replace(/Color3\.fromRGB\(50,\s*50,\s*50\)/g,  "Color3.fromRGB(15, 45, 20)");
+  // Loading bar (vermelho → verde neon)
+  code = code.replace(/Color3\.fromRGB\(255,\s*0,\s*0\)/g,   "Color3.fromRGB(0, 255, 100)");
+  // Botões vermelhos
+  code = code.replace(/Color3\.fromRGB\(100,\s*100,\s*100\)/g, "Color3.fromRGB(15, 45, 20)");
 
   // ── Redireciona sub-arquivos para o proxy ───────────────────────────
   code = code.replace(

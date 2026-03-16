@@ -22,75 +22,30 @@ export default async function handler(req, res) {
 
       const realHwid = hwid || ("portal-" + key.slice(-8));
 
-      // DEBUG: busca info da key e loga a resposta completa
-      const keyInfoRes = await fetch(`${PANDA_BASE}/keys/api/key?key=${encodeURIComponent(key)}`, {
-        headers: { "X-API-Key": API_KEY }
-      });
-      const keyInfoRaw = await keyInfoRes.text();
-      console.log("GET /keys/api/key status:", keyInfoRes.status);
-      console.log("GET /keys/api/key body:", keyInfoRaw);
-
-      let keyInfo = null;
-      try { keyInfo = JSON.parse(keyInfoRaw); } catch(e) {}
-
-      // Se não achou pelo valor, tenta validar direto sem HWID (keys generated aceitam)
-      if (!keyInfo || keyInfo.error || keyInfoRes.status === 404) {
-        // Tenta validate-account sem HWID
-        const valRes = await fetch(`${PANDA_BASE}/keys/validate-account`, {
-          method:  "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ServiceID: SERVICE_ID,
-            Key:       key,
-            HWID:      realHwid,
-            AccountID: account || "portal"
-          })
-        });
-        const valRaw = await valRes.text();
-        console.log("validate-account body:", valRaw);
-        let valData = null;
-        try { valData = JSON.parse(valRaw); } catch(e) {}
-
-        if (valData && valData.Authenticated_Status === "Success") {
-          return res.status(200).json({
-            valid:   true,
-            expire:  parseExpire(valData.Expire_Date),
-            premium: !!valData.Key_Premium,
-            note:    "Key válida"
-          });
-        }
-
-        return res.status(200).json({
-          valid: false,
-          note:  valData?.Note || "Key não encontrada",
-          debug: { keyInfoStatus: keyInfoRes.status, keyInfoBody: keyInfoRaw, valBody: valRaw }
-        });
+      // Tenta 1: com HWID
+      let data = await validateAccount(PANDA_BASE, SERVICE_ID, key, realHwid, account);
+      if (data.Authenticated_Status === "Success") {
+        return res.status(200).json(buildSuccess(data));
       }
 
-      // Key existe — verifica se está banida/expirada
-      const status = (keyInfo.status || "").toLowerCase();
-      if (status === "banned" || status === "revoked" || status === "disabled") {
-        return res.status(200).json({ valid: false, note: "Key banida ou revogada" });
-      }
-      if (keyInfo.expiresAt) {
-        const exp = new Date(keyInfo.expiresAt);
-        if (!isNaN(exp.getTime()) && exp < new Date()) {
-          return res.status(200).json({ valid: false, note: "Key expirada" });
-        }
+      // Tenta 2: sem HWID (para keys com noHwidValidation ativado)
+      data = await validateAccount(PANDA_BASE, SERVICE_ID, key, null, account);
+      if (data.Authenticated_Status === "Success") {
+        // Vincula o HWID agora que validou
+        await fetch(`${PANDA_BASE}/keys/api/key`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", "X-API-Key": API_KEY },
+          body: JSON.stringify({ key, hwid: realHwid, status: "active" })
+        }).catch(() => {});
+        return res.status(200).json(buildSuccess(data));
       }
 
-      // Ativa e vincula HWID
-      await fetch(`${PANDA_BASE}/keys/api/key`, {
-        method:  "PUT",
-        headers: { "Content-Type": "application/json", "X-API-Key": API_KEY },
-        body: JSON.stringify({ key, hwid: realHwid, status: "active" })
-      }).catch(() => {});
-
+      // Key não encontrada de nenhuma forma
       return res.status(200).json({
-        valid:   true,
-        expire:  parseExpire(keyInfo.expiresAt),
-        premium: !!keyInfo.isPremium,
-        note:    "Key válida"
+        valid: false,
+        note: data.Note === "Key not found"
+          ? "Key não encontrada. Certifique-se de que foi gerada com 'No HWID Validation' ou passe pelo GetKey primeiro."
+          : (data.Note || "Key inválida")
       });
     }
 
@@ -98,14 +53,16 @@ export default async function handler(req, res) {
     if (action === "reset-hwid") {
       if (!key) return res.status(400).json({ success: false, message: "Key não informada" });
 
+      // Tenta limpar HWID via PUT
       await fetch(`${PANDA_BASE}/keys/api/key`, {
-        method:  "PUT",
+        method: "PUT",
         headers: { "Content-Type": "application/json", "X-API-Key": API_KEY },
         body: JSON.stringify({ key, hwid: "" })
       }).catch(() => {});
 
+      // Tenta endpoint nativo
       await fetch(`${PANDA_BASE}/keys/reset-hwid`, {
-        method:  "POST",
+        method: "POST",
         headers: { "Content-Type": "application/json", "X-API-Key": API_KEY },
         body: JSON.stringify({ key })
       }).catch(() => {});
@@ -116,7 +73,7 @@ export default async function handler(req, res) {
     // ── EXECUTION TRACKING ────────────────────────────────────────
     if (action === "execution") {
       await fetch(`${PANDA_BASE}/keys/api/execution`, {
-        method:  "POST",
+        method: "POST",
         headers: { "Content-Type": "application/json", "X-API-Key": API_KEY }
       }).catch(() => {});
       return res.status(200).json({ success: true });
@@ -125,9 +82,28 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Ação inválida" });
 
   } catch (e) {
-    console.error("PandaDev proxy error:", e);
     return res.status(500).json({ valid: false, note: "Erro interno: " + e.message });
   }
+}
+
+async function validateAccount(base, serviceId, key, hwid, account) {
+  const body = { ServiceID: serviceId, Key: key, AccountID: account || "portal" };
+  if (hwid) body.HWID = hwid;
+  const r = await fetch(`${base}/keys/validate-account`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  return r.json();
+}
+
+function buildSuccess(data) {
+  return {
+    valid:   true,
+    expire:  parseExpire(data.Expire_Date),
+    premium: !!data.Key_Premium,
+    note:    "Key válida"
+  };
 }
 
 function parseExpire(raw) {

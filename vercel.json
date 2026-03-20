@@ -4,7 +4,6 @@
     { "src": "/fruitsource.lua", "dest": "/api/fruitsource" },
     { "src": "/bloxfruits.lua", "dest": "/api/fruitsource" },
     { "src": "/sources/nox/data/fruitsource.lua", "dest": "/api/fruitsource" },
-    { "src": "/sources/nox/BloxFruits.lua", "dest": "/api/fruitsource" },
-    { "src": "/api/validatekey", "dest": "/api/validatekey" }
+    { "src": "/sources/nox/BloxFruits.lua", "dest": "/api/fruitsource" }
   ]
 }
